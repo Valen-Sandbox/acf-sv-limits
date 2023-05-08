@@ -60,3 +60,18 @@ hook_Add( "OnEntityCreated", "ACF_Limits_Caliber", function( ent )
         end )
     end )
 end )
+
+hook_Add( "ACF_IsLegal", "ACF_Limits_Caliber", function( ent )
+    if not ent.Caliber then return end
+
+    local ply = ent:CPPIGetOwner()
+    local caliberLimit = caliberCvar:GetInt()
+    local entCaliber = data.Caliber
+
+    if ply.CaliberTotal < 0 then ply.CaliberTotal = 0 end -- This value should never go below 0
+    local newTotal = ply.CaliberTotal + entCaliber
+
+    if newTotal > caliberLimit then return false, "Caliber Limited", "Your weapon would surpass the total caliber limit (" .. caliberLimit .. " mm) and has been disabled." end
+
+    ply.CaliberTotal = ply.CaliberTotal + entCaliber
+end )
