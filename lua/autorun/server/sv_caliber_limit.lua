@@ -33,6 +33,7 @@ hook_Add( "ACF_CanUpdateEntity", "ACF_Limits_Caliber", function( ent, data )
     ply.CaliberTotal = ply.CaliberTotal + caliberNew - caliberOld
 
     ent:CallOnRemove( "ACF_Limits_Caliber", function()
+        if ply.CaliberTotal < 0 then ply.CaliberTotal = 0 end
         ply.CaliberTotal = ply.CaliberTotal - caliberNew
     end )
 end )
