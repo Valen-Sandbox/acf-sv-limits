@@ -1,11 +1,9 @@
 local IsValid = IsValid
 local timer_Simple = timer.Simple
-local CreateConVar = CreateConVar
-local hook_Add = hook.Add
 
 local cvarFlags = { FCVAR_ARCHIVE, FCVAR_REPLICATED }
-
 local caliberCvar = CreateConVar( "acf_limits_caliber", 5000, cvarFlags, "The maximum total ACF caliber that a player can have out at once (in mm).", 0, 5000 )
+
 local overCaliberEnts = {}
 
 local function totalClamp( total )
@@ -25,11 +23,11 @@ local function clearOnRemove( ent, ply, caliber )
     end )
 end
 
-hook_Add( "PlayerInitialSpawn", "ACF_Limits_Caliber", function( ply )
+hook.Add( "PlayerInitialSpawn", "ACF_Limits_Caliber", function( ply )
     ply.CaliberTotal = 0
 end )
 
-hook_Add( "ACF_CanCreateEntity", "ACF_Limits_Caliber", function( class, ply, _, _, data )
+hook.Add( "ACF_CanCreateEntity", "ACF_Limits_Caliber", function( class, ply, _, _, data )
     if class ~= ( "acf_gun" or "acf_rack" ) then return end
 
     local caliberLimit = caliberCvar:GetInt()
@@ -41,7 +39,7 @@ hook_Add( "ACF_CanCreateEntity", "ACF_Limits_Caliber", function( class, ply, _, 
     if newTotal > caliberLimit then return false, "Total caliber limit would be reached! (" .. caliberLimit .. " mm)" end
 end )
 
-hook_Add( "ACF_CanUpdateEntity", "ACF_Limits_Caliber", function( ent, data )
+hook.Add( "ACF_CanUpdateEntity", "ACF_Limits_Caliber", function( ent, data )
     if ent:GetClass() ~= ( "acf_gun" or "acf_rack" ) then return end
 
     local ply = ent:CPPIGetOwner()
@@ -58,7 +56,7 @@ hook_Add( "ACF_CanUpdateEntity", "ACF_Limits_Caliber", function( ent, data )
     clearOnRemove( ent, ply, caliberNew )
 end )
 
-hook_Add( "OnEntityCreated", "ACF_Limits_Caliber", function( ent )
+hook.Add( "OnEntityCreated", "ACF_Limits_Caliber", function( ent )
     timer_Simple( 0, function()
         if not IsValid( ent ) or ent:GetClass() ~= ( "acf_gun" or "acf_rack" ) then return end
 
@@ -78,7 +76,7 @@ hook_Add( "OnEntityCreated", "ACF_Limits_Caliber", function( ent )
     end )
 end )
 
-hook_Add( "ACF_IsLegal", "ACF_Limits_Caliber", function( ent )
+hook.Add( "ACF_IsLegal", "ACF_Limits_Caliber", function( ent )
     if not overCaliberEnts[ent] then return end
     if ent:GetClass() ~= ( "acf_gun" or "acf_rack" ) then return end
 
