@@ -58,7 +58,7 @@ end )
 
 hook.Add( "OnEntityCreated", "ACF_Limits_Caliber", function( ent )
     timer_Simple( 0, function()
-        if not IsValid( ent ) or ent:GetClass() ~= ( "acf_gun" or "acf_rack" ) then return end
+        if not IsValid( ent ) or ent:GetClass() ~= ( "acf_gun" or "acf_rack" ) or ent.BulletData.Type == "SM" then return end
 
         local ply = ent:CPPIGetOwner()
         local caliberLimit = caliberCvar:GetInt()
@@ -79,6 +79,7 @@ end )
 hook.Add( "ACF_IsLegal", "ACF_Limits_Caliber", function( ent )
     if not overCaliberEnts[ent] then return end
     if ent:GetClass() ~= ( "acf_gun" or "acf_rack" ) then return end
+    if ent.BulletData.Type == "SM" then return end
 
     local ply = ent:CPPIGetOwner()
     local caliberLimit = caliberCvar:GetInt()
