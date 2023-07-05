@@ -2,7 +2,7 @@ local IsValid = IsValid
 local timer_Simple = timer.Simple
 
 local cvarFlags = { FCVAR_ARCHIVE, FCVAR_REPLICATED }
-local caliberCvar = CreateConVar( "acf_limits_caliber", 5000, cvarFlags, "The maximum total ACF caliber that a player can have out at once (in mm). Set to 0 to disable this limit.", 0, 5000 )
+local caliberCvar = CreateConVar( "acf_limits_caliber", 500, cvarFlags, "The maximum total ACF caliber that a player can have out at once (in mm). Set to 0 to disable this limit.", 0, 5000 )
 
 local overCaliberEnts = {}
 
