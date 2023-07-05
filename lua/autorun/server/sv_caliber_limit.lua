@@ -2,7 +2,7 @@ local IsValid = IsValid
 local timer_Simple = timer.Simple
 
 local cvarFlags = { FCVAR_ARCHIVE, FCVAR_REPLICATED }
-local caliberCvar = CreateConVar( "acf_limits_caliber", 5000, cvarFlags, "The maximum total ACF caliber that a player can have out at once (in mm).", 0, 5000 )
+local caliberCvar = CreateConVar( "acf_limits_caliber", 5000, cvarFlags, "The maximum total ACF caliber that a player can have out at once (in mm). Set to 0 to disable this limit.", 0, 5000 )
 
 local overCaliberEnts = {}
 
@@ -30,9 +30,10 @@ hook.Add( "PlayerInitialSpawn", "ACF_Limits_Caliber", function( ply )
 end )
 
 hook.Add( "ACF_CanCreateEntity", "ACF_Limits_Caliber", function( class, ply, _, _, data )
+    local caliberLimit = caliberCvar:GetInt()
+    if caliberLimit == 0 then return end
     if class ~= ( "acf_gun" or "acf_rack" ) then return end
 
-    local caliberLimit = caliberCvar:GetInt()
     local entCaliber = data.Caliber
 
     totalClamp( ply.CaliberTotal )
@@ -42,10 +43,11 @@ hook.Add( "ACF_CanCreateEntity", "ACF_Limits_Caliber", function( class, ply, _, 
 end )
 
 hook.Add( "ACF_CanUpdateEntity", "ACF_Limits_Caliber", function( ent, data )
+    local caliberLimit = caliberCvar:GetInt()
+    if caliberLimit == 0 then return end
     if ent:GetClass() ~= ( "acf_gun" or "acf_rack" ) then return end
 
     local ply = ent:CPPIGetOwner()
-    local caliberLimit = caliberCvar:GetInt()
     local caliberOld = ent.Caliber
     local caliberNew = data.Caliber
 
@@ -61,11 +63,14 @@ end )
 hook.Add( "OnEntityCreated", "ACF_Limits_Caliber", function( ent )
     timer_Simple( 0, function()
         if not IsValid( ent ) then return end
+
+        local caliberLimit = caliberCvar:GetInt()
+        if caliberLimit == 0 then return end
+
         if ent:GetClass() ~= ( "acf_gun" or "acf_rack" ) then return end
         if ent.BulletData.Type == "SM" then return end -- TODO: Cvar for excluding smokes? Maybe?
 
         local ply = ent:CPPIGetOwner()
-        local caliberLimit = caliberCvar:GetInt()
         local entCaliber = ent.Caliber
 
         totalClamp( ply.CaliberTotal )
@@ -81,12 +86,14 @@ hook.Add( "OnEntityCreated", "ACF_Limits_Caliber", function( ent )
 end )
 
 hook.Add( "ACF_IsLegal", "ACF_Limits_Caliber", function( ent )
+    local caliberLimit = caliberCvar:GetInt()
+
+    if caliberLimit == 0 then return end
     if not overCaliberEnts[ent] then return end
     if ent:GetClass() ~= ( "acf_gun" or "acf_rack" ) then return end
     if ent.BulletData.Type == "SM" then return end
 
     local ply = ent:CPPIGetOwner()
-    local caliberLimit = caliberCvar:GetInt()
 
     if ply.CaliberTotal > caliberLimit then
         return false, "Caliber Limited", "Your weapon would surpass the total caliber limit (" .. caliberLimit .. " mm) and has been disabled."
