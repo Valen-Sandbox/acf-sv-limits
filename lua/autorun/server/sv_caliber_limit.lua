@@ -14,6 +14,8 @@ end
 
 local function clearOnRemove( ent, ply, caliber )
     ent:CallOnRemove( "ACF_Limits_Caliber", function()
+        if not IsValid( ent ) then return end
+
         if overCaliberEnts[ent] then
             overCaliberEnts[ent] = nil
         end
@@ -58,7 +60,9 @@ end )
 
 hook.Add( "OnEntityCreated", "ACF_Limits_Caliber", function( ent )
     timer_Simple( 0, function()
-        if not IsValid( ent ) or ent:GetClass() ~= ( "acf_gun" or "acf_rack" ) or ent.BulletData.Type == "SM" then return end
+        if not IsValid( ent ) then return end
+        if ent:GetClass() ~= ( "acf_gun" or "acf_rack" ) then return end
+        if ent.BulletData.Type == "SM" then return end -- TODO: Cvar for excluding smokes? Maybe?
 
         local ply = ent:CPPIGetOwner()
         local caliberLimit = caliberCvar:GetInt()
