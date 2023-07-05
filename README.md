@@ -3,7 +3,7 @@ A set of tools that server owners can use to place limits on commonly abused asp
 
 ## ConVars
 - **acf_limits_caliber**: The maximum total ACF caliber that a player can have out at once (in mm). Set to 0 to disable limitations.
-- **acf_limits_mass**: The maximum mass that a contraption may have before its weapons are disabled (in whole kg). Set to 0 to disable limitations.
+- **acf_limits_mass**: The maximum mass that a contraption may have before its weapons/engines are disabled (in whole kg). Set to 0 to disable limitations.
 
 ## Requirements
 - [ACF-3](https://github.com/Stooberton/ACF-3)
