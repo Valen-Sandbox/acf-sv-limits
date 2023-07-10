@@ -8,7 +8,7 @@ Please be aware that this addon is still fairly WIP and subject to change in beh
 - **acf_limits_mass**: The maximum mass that a contraption may have before its weapons/engines are disabled (in whole kg). Set to 0 to disable limitations.
 - **acf_limits_missiles**: The maximum number of missiles that a contraption may hold before further racks are disabled. Set to 0 to disable limitations.
 - **acf_limits_rockets**: The maximum number of rockets that a contraption may hold before further racks are disabled. Set to 0 to disable limitations.
-- **acf_limits_worldweld**: Removes the ability to weld entities to the world if enabled. This is intended to prevent instantly stopping brakes that use this method.
+- **acf_limits_worldweld**: Removes the ability to weld contraptions to the world if enabled. This is intended to prevent instantly stopping brakes that use this method.
 
 ## Requirements
 - [ACF-3](https://github.com/Stooberton/ACF-3)
