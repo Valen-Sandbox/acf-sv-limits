@@ -6,9 +6,15 @@ local caliberCvar = CreateConVar( "acf_limits_caliber", 500, cvarFlags, "The max
 
 local overCaliberEnts = {}
 
+local nonLethalAmmo = {
+    ["SM"] = true,
+    ["FLR"] = true,
+    ["Refill"] = true
+}
+
 local function totalClamp( total )
     -- This value should never go below 0
-    if total >= 0 then return end
+    if total and total >= 0 then return end
     total = 0
 end
 
@@ -68,7 +74,7 @@ hook.Add( "OnEntityCreated", "ACF_Limits_Caliber", function( ent )
         if caliberLimit == 0 then return end
 
         if ent:GetClass() ~= ( "acf_gun" or "acf_rack" ) then return end
-        if ent.BulletData.Type == "SM" then return end -- TODO: Cvar for excluding smokes? Maybe?
+        if nonLethalAmmo[ent.BulletData.Type] then return end -- TODO: Cvar for excluding nonlethals? Maybe?
 
         local ply = ent:CPPIGetOwner()
         local entCaliber = ent.Caliber
@@ -91,7 +97,8 @@ hook.Add( "ACF_IsLegal", "ACF_Limits_Caliber", function( ent )
     if caliberLimit == 0 then return end
     if not overCaliberEnts[ent] then return end
     if ent:GetClass() ~= ( "acf_gun" or "acf_rack" ) then return end
-    if ent.BulletData.Type == "SM" then return end
+    if ent.Class == "SL" and ent.BulletData.Type == "Empty" then return end -- Weird workaround for smoke launchers not having ammo data fast enough on spawn?
+    if nonLethalAmmo[ent.BulletData.Type] then return end
 
     local ply = ent:CPPIGetOwner()
 
