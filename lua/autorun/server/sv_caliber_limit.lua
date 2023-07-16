@@ -99,7 +99,8 @@ hook.Add( "ACF_IsLegal", "ACF_Limits_Caliber", function( ent )
     if ent:GetClass() ~= ( "acf_gun" or "acf_rack" ) then return end
 
     local ammoType = ent.BulletData.Type
-    if ent.Class == "SL" and ammoType == "Empty" then return end -- Weird workaround for smoke launchers not having ammo data fast enough on spawn?
+    local class = ent.Class
+    if ( class == "SL" or class == "FGL" ) and ammoType == "Empty" then return end -- Weird workaround for smoke/flare launchers not having ammo data fast enough on spawn?
     if nonLethalAmmo[ammoType] then return end
 
     local ply = ent:CPPIGetOwner()
