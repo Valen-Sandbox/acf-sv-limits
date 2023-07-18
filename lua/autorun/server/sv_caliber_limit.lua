@@ -31,6 +31,40 @@ local function clearOnRemove( ent, ply, caliber )
     end )
 end
 
+-- NOTE: This is done recursively to ensure that non-lethal ammo types are properly excluded for dupes.
+-- Ammo type data isn't readable from the weapon until it's loaded.
+local function onSpawnRecursive( ent )
+    timer_Simple( 1, function()
+        if not IsValid( ent ) then return end
+
+        local caliberLimit = caliberCvar:GetInt()
+        if caliberLimit == 0 then return end
+        if ent:GetClass() ~= ( "acf_gun" or "acf_rack" ) then return end
+
+        local ammoType = ent.BulletData.Type
+        if ent.State == "Loading" then
+            onSpawnRecursive( ent )
+
+            return
+        end
+        if nonLethalAmmo[ammoType] then return end -- TODO: Cvar for excluding nonlethals? Maybe?
+
+        local ply = ent:CPPIGetOwner()
+        local entCaliber = ent.Caliber
+
+        totalClamp( ply.CaliberTotal )
+        local newTotal = ply.CaliberTotal + entCaliber
+
+        if newTotal > caliberLimit then
+            overCaliberEnts[ent] = true
+        end
+
+        ply.CaliberTotal = ply.CaliberTotal + entCaliber
+        clearOnRemove( ent, ply, ent.Caliber )
+    end )
+end
+hook.Add( "OnEntityCreated", "ACF_Limits_Caliber", onSpawnRecursive )
+
 hook.Add( "PlayerInitialSpawn", "ACF_Limits_Caliber", function( ply )
     ply.CaliberTotal = 0
 end )
@@ -66,42 +100,13 @@ hook.Add( "ACF_CanUpdateEntity", "ACF_Limits_Caliber", function( ent, data )
     clearOnRemove( ent, ply, caliberNew )
 end )
 
-hook.Add( "OnEntityCreated", "ACF_Limits_Caliber", function( ent )
-    timer_Simple( 0, function()
-        if not IsValid( ent ) then return end
-
-        local caliberLimit = caliberCvar:GetInt()
-        if caliberLimit == 0 then return end
-
-        if ent:GetClass() ~= ( "acf_gun" or "acf_rack" ) then return end
-        if nonLethalAmmo[ent.BulletData.Type] then return end -- TODO: Cvar for excluding nonlethals? Maybe?
-
-        local ply = ent:CPPIGetOwner()
-        local entCaliber = ent.Caliber
-
-        totalClamp( ply.CaliberTotal )
-        local newTotal = ply.CaliberTotal + entCaliber
-
-        if newTotal > caliberLimit then
-            overCaliberEnts[ent] = true
-        end
-
-        ply.CaliberTotal = ply.CaliberTotal + entCaliber
-        clearOnRemove( ent, ply, ent.Caliber )
-    end )
-end )
-
 hook.Add( "ACF_IsLegal", "ACF_Limits_Caliber", function( ent )
     local caliberLimit = caliberCvar:GetInt()
 
     if caliberLimit == 0 then return end
     if not overCaliberEnts[ent] then return end
     if ent:GetClass() ~= ( "acf_gun" or "acf_rack" ) then return end
-
-    local ammoType = ent.BulletData.Type
-    local class = ent.Class
-    if ( class == "SL" or class == "FGL" ) and ammoType == "Empty" then return end -- Weird workaround for smoke/flare launchers not having ammo data fast enough on spawn?
-    if nonLethalAmmo[ammoType] then return end
+    if nonLethalAmmo[ent.BulletData.Type] then return end
 
     local ply = ent:CPPIGetOwner()
 
