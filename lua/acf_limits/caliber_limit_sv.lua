@@ -34,7 +34,7 @@ end
 -- NOTE: This is done recursively to ensure that non-lethal ammo types are properly excluded for dupes.
 -- Ammo type data isn't readable from the weapon until it's loaded.
 local function onSpawnRecursive( ent )
-    timer_Simple( 1, function()
+    timer_Simple( 0.5, function()
         if not IsValid( ent ) then return end
 
         local caliberLimit = caliberCvar:GetInt()
