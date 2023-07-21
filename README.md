@@ -12,7 +12,7 @@ Please be aware that this addon is still fairly WIP and subject to change in beh
 - **acf_limits_worldweld**: Removes the ability to weld contraptions to the world if enabled. This is intended to prevent instantly stopping brakes that use this method.
 
 Additionally, because this addon uses the same loader module as ACF, the following is also available:
-- The hook **ACF_Limits_OnAddonLoad** (runs after the addon is fully loaded)
+- The hook **ACF_Limits_OnLoadAddon** (runs after the addon is fully loaded)
 - The concommand **acf_limits_reload** (reloads the addon)
 
 ## Requirements
