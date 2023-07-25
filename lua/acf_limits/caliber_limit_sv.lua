@@ -7,10 +7,6 @@ local caliberCvar = CreateConVar( "acf_limits_caliber", 500, cvarFlags, "The max
 local overCaliberEnts = {}
 local excludedEnts = {}
 
--- NOTE: Caliber value taken from ACF.MinFuzeCaliber because racks do not necessarily have a caliber
--- https://github.com/Stooberton/ACF-3/blob/1272f2662a8a9aecacad899b998c5235b93c7faa/lua/acf/core/globals.lua#L42
-local DEF_CALIBER = 20
-
 local nonLethalAmmo = {
     ["SM"] = true,
     ["FLR"] = true
@@ -52,7 +48,8 @@ hook.Add( "OnEntityCreated", "ACF_Limits_Caliber", function( ent )
         if nonLethalAmmo[ent.BulletData.Type] then return end -- TODO: Cvar for excluding nonlethals? Maybe?
 
         local ply = ent:CPPIGetOwner()
-        local entCaliber = ent.Caliber or DEF_CALIBER
+        local entCaliber = ent.Caliber
+        if not entCaliber then return end
 
         totalClamp( ply.CaliberTotal )
         local newTotal = ply.CaliberTotal + entCaliber
@@ -61,7 +58,7 @@ hook.Add( "OnEntityCreated", "ACF_Limits_Caliber", function( ent )
             overCaliberEnts[ent] = true
         end
 
-        ply.CaliberTotal = ply.CaliberTotal + entCaliber
+        ply.CaliberTotal = newTotal
         clearOnRemove( ent, ply, entCaliber )
     end )
 end )
@@ -75,7 +72,8 @@ hook.Add( "ACF_CanCreateEntity", "ACF_Limits_Caliber", function( class, ply, _, 
     if caliberLimit == 0 then return end
     if class ~= "acf_gun" and class ~= "acf_rack" then return end
 
-    local entCaliber = data.Caliber or DEF_CALIBER
+    local entCaliber = data.Caliber
+    if not entCaliber then return end
 
     totalClamp( ply.CaliberTotal )
     local newTotal = ply.CaliberTotal + entCaliber
@@ -90,8 +88,9 @@ hook.Add( "ACF_CanUpdateEntity", "ACF_Limits_Caliber", function( ent, data )
     if entClass ~= "acf_gun" and entClass ~= "acf_rack" then return end
 
     local ply = ent:CPPIGetOwner()
-    local caliberOld = ent.Caliber or DEF_CALIBER
-    local caliberNew = data.Caliber or DEF_CALIBER
+    local caliberOld = ent.Caliber
+    local caliberNew = data.Caliber
+    if not caliberOld or not caliberNew then return end
 
     totalClamp( ply.CaliberTotal )
     local newTotal = ply.CaliberTotal + caliberNew - caliberOld
@@ -114,7 +113,7 @@ hook.Add( "ACF_IsLegal", "ACF_Limits_Caliber", function( ent )
     local ammoType = ent.BulletData.Type
     if ammoType == "Empty" then return end
     if nonLethalAmmo[ammoType] then
-        local entCaliber = ent.Caliber or DEF_CALIBER
+        local entCaliber = ent.Caliber
         ply.CaliberTotal = ply.CaliberTotal - entCaliber
 
         excludedEnts[ent] = true
