@@ -2,14 +2,21 @@ local IsValid = IsValid
 local timer_Simple = timer.Simple
 
 local cvarFlags = { FCVAR_ARCHIVE, FCVAR_REPLICATED }
-local caliberCvar = CreateConVar( "acf_limits_caliber", 500, cvarFlags, "The maximum total ACF caliber of guns that a player can have out at once (in mm). Set to 0 to disable this limit.", 0, 5000 )
+local caliberCvar = CreateConVar( "acf_limits_caliber", 1000, cvarFlags, "The maximum total ACF caliber of guns that a player can have out at once (in mm). Set to 0 to disable this limit.", 0, 5000 )
+local nonlethalsCvar = CreateConVar( "acf_limits_caliber_nonlethals", 1, cvarFlags, "Determines whether non-lethal entities (loaded with smoke/flares) should count towards the caliber limit.", 0, 1)
 
 local overCaliberEnts = {}
 local excludedEnts = {}
 
 local nonLethalAmmo = {
     ["SM"] = true,
-    ["FLR"] = true
+    ["FLR"] = true,
+    ["Empty"] = true
+}
+
+local nonlethalWeps = {
+    ["SL"] = true,
+    ["FGL"] = true
 }
 
 local function totalClamp( total )
@@ -37,29 +44,40 @@ local function clearOnRemove( ent, ply, caliber )
     end )
 end
 
+-- Adds to the caliber limit of a player using either the caliber of a new lethal entity or a non-lethal entity that is now loaded with lethal ammo
+local function addNewEnt( ent, caliberLimit )
+    local ply = ent:CPPIGetOwner()
+    if not IsValid( ply ) then return end
+
+    local entCaliber = ent.Caliber
+    if not entCaliber then return end
+
+    totalClamp( ply.CaliberTotal )
+    local newTotal = ply.CaliberTotal + entCaliber
+
+    if newTotal > caliberLimit then
+        overCaliberEnts[ent] = true
+    end
+
+    ply.CaliberTotal = newTotal
+    clearOnRemove( ent, ply, entCaliber )
+end
+
 hook.Add( "OnEntityCreated", "ACF_Limits_Caliber", function( ent )
     timer_Simple( 0, function()
         if not IsValid( ent ) then return end
 
         local caliberLimit = caliberCvar:GetInt()
         if caliberLimit == 0 then return end
-        local entClass = ent:GetClass()
-        if entClass ~= "acf_gun" then return end
-        if nonLethalAmmo[ent.BulletData.Type] then return end -- TODO: Cvar for excluding nonlethals? Maybe?
+        if ent:GetClass() ~= "acf_gun" then return end
 
-        local ply = ent:CPPIGetOwner()
-        local entCaliber = ent.Caliber
-        if not entCaliber then return end
+        if nonlethalsCvar:GetBool() and nonlethalWeps[ent.Class] then
+            excludedEnts[ent] = true
 
-        totalClamp( ply.CaliberTotal )
-        local newTotal = ply.CaliberTotal + entCaliber
-
-        if newTotal > caliberLimit then
-            overCaliberEnts[ent] = true
+            return
         end
 
-        ply.CaliberTotal = newTotal
-        clearOnRemove( ent, ply, entCaliber )
+        addNewEnt( ent, caliberLimit )
     end )
 end )
 
@@ -84,8 +102,7 @@ end )
 hook.Add( "ACF_CanUpdateEntity", "ACF_Limits_Caliber", function( ent, data )
     local caliberLimit = caliberCvar:GetInt()
     if caliberLimit == 0 then return end
-    local entClass = ent:GetClass()
-    if entClass ~= "acf_gun" then return end
+    if ent:GetClass() ~= "acf_gun" then return end
 
     local ply = ent:CPPIGetOwner()
     local caliberOld = ent.Caliber
@@ -103,29 +120,23 @@ end )
 
 hook.Add( "ACF_IsLegal", "ACF_Limits_Caliber", function( ent )
     local caliberLimit = caliberCvar:GetInt()
-
     if caliberLimit == 0 then return end
-    local entClass = ent:GetClass()
-    if entClass ~= "acf_gun" then return end
-    if excludedEnts[ent] then return end
+    if ent:GetClass() ~= "acf_gun" then return end
 
-    local ply = ent:CPPIGetOwner()
-    if not IsValid( ply ) then return end
+    if excludedEnts[ent] then
+        local ammoType = ent.BulletData.Type
 
-    local ammoType = ent.BulletData.Type
-    if ammoType == "Empty" then return end
-    if nonLethalAmmo[ammoType] then
-        local entCaliber = ent.Caliber
-        ply.CaliberTotal = ply.CaliberTotal - entCaliber
+        if not nonLethalAmmo[ammoType] then
+            addNewEnt( ent, caliberLimit )
 
-        excludedEnts[ent] = true
-        if overCaliberEnts[ent] then
-            overCaliberEnts[ent] = nil
+            excludedEnts[ent] = nil
         end
 
         return
     end
 
+    local ply = ent:CPPIGetOwner()
+    if not IsValid( ply ) then return end
     if not overCaliberEnts[ent] then return end
 
     if ply.CaliberTotal > caliberLimit then
