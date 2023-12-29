@@ -6,6 +6,7 @@ Please be aware that this addon is still somewhat WIP and potentially subject to
 ## ConVars
 - **acf_limits_ammobomb**: Prevents ammo/fuel boxes from detonating when not connected to any components if enabled.
 - **acf_limits_caliber**: The maximum total ACF caliber of guns that a player can have out at once (in mm). Set to 0 to disable limitations.
+- **acf_limits_caliber_nonlethals**: Determines whether non-lethal entities (loaded with smoke/flares) should count towards the caliber limit.
 - **acf_limits_mass**: The maximum mass that a contraption may have before its weapons/engines are disabled (in whole kg). Set to 0 to disable limitations.
 - **acf_limits_missiles**: The maximum number of missiles that a contraption may hold before further racks are disabled. Set to 0 to disable limitations.
 - **acf_limits_parentdist**: The maximum distance that parented weapons/engines/ammo boxes can be from their root parent (in Source units). Set to 0 to disable limits.
