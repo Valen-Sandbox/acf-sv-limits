@@ -11,7 +11,6 @@ Please be aware that this addon is still somewhat WIP and potentially subject to
 - **acf_limits_missiles**: The maximum number of missiles that a contraption may hold before further racks are disabled. Set to 0 to disable limitations.
 - **acf_limits_parentdist**: The maximum distance that parented weapons/engines/ammo boxes can be from their root parent (in Source units). Set to 0 to disable limits.
 - **acf_limits_rockets**: The maximum number of rockets that a contraption may hold before further racks are disabled. Set to 0 to disable limitations.
-- **acf_limits_setnotsolid**: Removes the ability to make vehicle entities not solid if enabled.
 - **acf_limits_worldweld**: Removes the ability to weld contraptions to the world if enabled. This is intended to prevent certain exploits that use this method.
 
 Additionally, because this addon uses the same loader module as ACF, the following is also available:
