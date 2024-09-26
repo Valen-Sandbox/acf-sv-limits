@@ -9,7 +9,7 @@ local disabledEnts = {
     ["acf_ammo"] = true
 }
 
-hook.Add( "ACF_IsLegal", "ACF_Limits_ParentDist", function( ent )
+hook.Add( "ACF_OnCheckLegal", "ACF_Limits_ParentDist", function( ent )
     local distLimit = distCvar:GetInt()
     if distLimit == 0 then return end
     if not disabledEnts[ent:GetClass()] then return end

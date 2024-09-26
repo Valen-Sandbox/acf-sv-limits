@@ -55,7 +55,7 @@ hook.Add( "cfw.contraption.entityRemoved", "ACF_Limits_Missiles", function( con,
     end
 end )
 
-hook.Add( "ACF_IsLegal", "ACF_Limits_Missiles", function( ent )
+hook.Add( "ACF_OnCheckLegal", "ACF_Limits_Missiles", function( ent )
     if not overLimitEnts[ent] then return end
     if ent:GetClass() ~= "acf_rack" then return end
 

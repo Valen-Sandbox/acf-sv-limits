@@ -118,7 +118,7 @@ hook.Add( "ACF_CanUpdateEntity", "ACF_Limits_Caliber", function( ent, data )
     clearOnRemove( ent, ply, caliberNew )
 end )
 
-hook.Add( "ACF_IsLegal", "ACF_Limits_Caliber", function( ent )
+hook.Add( "ACF_OnCheckLegal", "ACF_Limits_Caliber", function( ent )
     local caliberLimit = caliberCvar:GetInt()
     if caliberLimit == 0 then return end
     if ent:GetClass() ~= "acf_gun" then return end

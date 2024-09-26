@@ -7,7 +7,7 @@ local disabledEnts = {
     ["acf_engine"] = true
 }
 
-hook.Add( "ACF_IsLegal", "ACF_Limits_Mass", function( ent )
+hook.Add( "ACF_OnCheckLegal", "ACF_Limits_Mass", function( ent )
     local massLimit = massCvar:GetInt()
     if massLimit == 0 then return end
     if not disabledEnts[ent:GetClass()] then return end
