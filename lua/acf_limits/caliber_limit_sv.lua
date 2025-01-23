@@ -85,7 +85,7 @@ hook.Add( "PlayerInitialSpawn", "ACF_Limits_Caliber", function( ply )
     ply.CaliberTotal = 0
 end )
 
-hook.Add( "ACF_CanCreateEntity", "ACF_Limits_Caliber", function( class, ply, _, _, data )
+hook.Add( "ACF_PreSpawnEntity", "ACF_Limits_Caliber", function( class, ply, data )
     local caliberLimit = caliberCvar:GetInt()
     if caliberLimit == 0 then return end
     if class ~= "acf_gun" then return end
@@ -99,10 +99,10 @@ hook.Add( "ACF_CanCreateEntity", "ACF_Limits_Caliber", function( class, ply, _, 
     if newTotal > caliberLimit then return false, "Total caliber limit would be reached! (" .. caliberLimit .. " mm)" end
 end )
 
-hook.Add( "ACF_CanUpdateEntity", "ACF_Limits_Caliber", function( ent, data )
+hook.Add( "ACF_PreUpdateEntity", "ACF_Limits_Caliber", function( class, ent, data )
     local caliberLimit = caliberCvar:GetInt()
     if caliberLimit == 0 then return end
-    if ent:GetClass() ~= "acf_gun" then return end
+    if class ~= "acf_gun" then return end
 
     local ply = ent:CPPIGetOwner()
     local caliberOld = ent.Caliber
