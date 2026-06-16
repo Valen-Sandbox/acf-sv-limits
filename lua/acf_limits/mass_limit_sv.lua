@@ -12,7 +12,7 @@ hook.Add( "ACF_OnCheckLegal", "ACF_Limits_Mass", function( ent )
     if massLimit == 0 then return end
     if not disabledEnts[ent:GetClass()] then return end
 
-    local con = ent:GetContraption()
+    local con = ent:CFW_GetContraption()
     if not con then return end
 
     if con.totalMass >= massLimit then return false, "Mass Limited", "Your contraption would surpass the mass limit (" .. massLimit .. " kg) and has been disabled." end
